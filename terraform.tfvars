@@ -1,4 +1,2 @@
-provider "google" {
-  project     = "cf-sandbox-kkelani"
-  region      = "us-central1"
-}
+env_name = "example-123"
+project = "cf-sandbox-kkelani"

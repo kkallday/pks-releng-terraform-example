@@ -1,10 +1,9 @@
-resource "google_compute_instance" "store" {
-  project = "cf-sandbox-kkelani"
-  name         = "store"
+resource "google_compute_instance" "storefront" {
+  name         = "${var.env_name}-storefront"
   machine_type = "n1-standard-1"
   zone         = "us-central1-a"
 
-  tags = ["allow-internal", "allow-external"]
+  tags = ["${var.env_name}-allow-internal", "${var.env_name}-allow-external"]
 
   boot_disk {
     initialize_params {
@@ -12,22 +11,25 @@ resource "google_compute_instance" "store" {
     }
   }
 
-  scratch_disk { }
+  scratch_disk {}
 
   network_interface {
-    network = "default"
+    subnetwork = "${google_compute_subnetwork.default.name}"
 
-    access_config { }
+    access_config {
+      nat_ip = "${google_compute_address.storefront.address}"
+    }
   }
+
+  metadata_startup_script = "sudo apt-get -y install nginx && sudo /etc/init.d/nginx start"
 }
 
 resource "google_compute_instance" "order-fulfillment" {
-  project = "cf-sandbox-kkelani"
-  name         = "order-fulfillment"
+  name         = "${var.env_name}-order-fulfillment"
   machine_type = "n1-standard-1"
   zone         = "us-central1-a"
 
-  tags = ["allow-internal"]
+  tags = ["${var.env_name}-allow-internal"]
 
   boot_disk {
     initialize_params {
@@ -35,11 +37,11 @@ resource "google_compute_instance" "order-fulfillment" {
     }
   }
 
-  scratch_disk { }
+  scratch_disk {}
 
   network_interface {
-    network = "default"
+    subnetwork = "${google_compute_subnetwork.default.name}"
 
-    access_config { }
+    access_config {}
   }
 }
